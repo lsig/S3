@@ -17,7 +17,6 @@ public class KdTree {
         private Node left;
         private Node right;
         private int size;
-        private boolean axis; //true == x, false == y
 
         public Node(Point2D p, int size) {
             this.p = p;
