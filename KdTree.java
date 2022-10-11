@@ -10,7 +10,6 @@ public class KdTree {
 
     private static class Node {
         private Point2D p;
-        private RectHV rect;
         private Node left;
         private Node right;
         private int size;
@@ -18,10 +17,6 @@ public class KdTree {
         public Node(Point2D p, int size) {
             this.p = p;
             this.size = size;
-        }
-
-        public int size() {
-            return this.size;
         }
     }
 
@@ -49,7 +44,6 @@ public class KdTree {
     private Node insert(Node x, Point2D p, int rank) {
         if (x == null) return new Node(p, 1);
         if (x.p.equals(p)) return x;
-
         double cmp;
         if (rank % 2 == 0) cmp = p.x() - x.p.x();
         else cmp = p.y() - x.p.y();
@@ -57,8 +51,13 @@ public class KdTree {
         if (cmp < 0) x.left = insert(x.left, p, rank + 1);
         else x.right = insert(x.right, p, rank + 1);
 
-        x.size += 1;
+        x.size = 1 + size(x.left) + size(x.right);
         return x;
+    }
+
+    private int size(Node x) {
+        if (x == null) return 0;
+        else return x.size;
     }
 
     // does the set contain the point p?
@@ -118,7 +117,7 @@ public class KdTree {
         double cmpMax;
         double cmpMin;
         if (x == null) return points;
-        if ((rect.xmax() >= x.p.x() && rect.xmin() <= x.p.x()) && (rect.ymax() >= x.p.y() && rect.ymin() <= x.p.y())) {
+        if (rect.contains(x.p)) {
             points.enqueue(x.p);
         }
         if (rank % 2 == 0) {
@@ -128,17 +127,48 @@ public class KdTree {
             cmpMax = rect.ymax() - x.p.y();
             cmpMin = rect.ymin() - x.p.y();
         }
-        if (cmpMax > 0 && cmpMin >= 0) points = range(x.right, rect, rank + 1, points);
-        else if (cmpMax > 0 && cmpMin < 0) {
+        if (cmpMax >= 0 && cmpMin >= 0) points = range(x.right, rect, rank + 1, points);
+        else if (cmpMax >= 0 && cmpMin <= 0) {
             points = range(x.left, rect, rank + 1, points);
             points = range(x.right, rect, rank + 1, points);
-        } else if (cmpMax < 0 && cmpMin <= 0) points = range(x.left, rect, rank + 1, points);
+        } else points = range(x.left, rect, rank + 1, points);
         return points;
     }
 
     // a nearest neighbor in the set to p; null if set is empty
     public Point2D nearest(Point2D p) {
-        return p;
+        if (isEmpty()) return null;
+        return nearest(root, p, root.p, 0);
+    }
+
+    private Point2D nearest(Node x, Point2D p, Point2D champion, int rank) {
+        if (x == null) return champion;
+        double championDistance = p.distanceSquaredTo(champion);
+        double contestantDistance = p.distanceSquaredTo(x.p);
+        Node firstSubtree;
+        Node secondSubtree;
+        double cmp;
+        if (contestantDistance < championDistance) {
+            champion = x.p;
+        }
+        if (rank % 2 == 0) cmp = p.x() - x.p.x();
+        else cmp = p.y() - x.p.y();
+        if (cmp < 0) {
+            //champion = nearest(x.left, p, champion, rank + 1);
+            firstSubtree = x.left;
+            secondSubtree = x.right;
+        } else {
+            //champion = nearest(x.right, p, champion, rank + 1);
+            firstSubtree = x.right;
+            secondSubtree = x.left;
+        }
+        champion = nearest(firstSubtree, p, champion, rank + 1);
+
+        if (secondSubtree != null && p.distanceSquaredTo(secondSubtree.p) < p.distanceSquaredTo(champion)) {
+            //champion = secondSubtree.p;
+            champion = nearest(secondSubtree, p, champion, rank + 1);
+        }
+        return champion;
     }
 
     /*******************************************************************************
