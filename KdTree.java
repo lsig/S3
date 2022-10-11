@@ -1,10 +1,7 @@
 /*************************************************************************
  *************************************************************************/
 
-import edu.princeton.cs.algs4.In;
-import edu.princeton.cs.algs4.Out;
-import edu.princeton.cs.algs4.Point2D;
-import edu.princeton.cs.algs4.RectHV;
+import edu.princeton.cs.algs4.*;
 
 import java.util.Arrays;
 
@@ -41,42 +38,69 @@ public class KdTree {
 
     // add the point p to the set (if it is not already in the set)
     public void insert(Point2D p) {
-        if (!contains(p)) root = insert(root, p, 0);
+        root = insert(root, p, 0);
     }
 
+    // recursively searches through the tree and adds the point if it doesn't exist.
     private Node insert(Node x, Point2D p, int rank) {
-        double cmp = 0;
         if (x == null) return new Node(p, 1);
+        if (x.p.equals(p)) return x;
+
+        double cmp;
         if (rank % 2 == 0) cmp = p.x() - x.p.x();
-        else if (rank % 2 == 1) cmp = p.y() - x.p.y();
+        else cmp = p.y() - x.p.y();
+
         if (cmp < 0) x.left = insert(x.left, p, rank + 1);
-        else if (cmp >= 0) x.right = insert(x.right, p, rank + 1);
+        else x.right = insert(x.right, p, rank + 1);
+
         x.size = 1 + x.left.size + x.right.size;
         return x;
     }
 
     // does the set contain the point p?
     public boolean contains(Point2D p) {
-        return get(p) != null;
+        return contains(root, p, 0);
     }
 
-    private Node get(Point2D p) {
-        return get(root, p, 0);
-    }
+    private boolean contains(Node x, Point2D p, int rank) {
+        if (x == null) return false;
+        if (x.p.equals(p)) return true;
 
-    private Node get(Node x, Point2D p, int rank) {
-        double cmp = 0;
-        if (x == null) return null;
-        if (x.p.equals(p)) return x;
+        double cmp;
         if (rank % 2 == 0) cmp = p.x() - x.p.x();
-        else if (rank % 2 == 1) cmp = p.y() - x.p.y();
-        if (cmp < 0) x.left = get(x.left, p, rank + 1);
-        else if (cmp >= 0) x.right = get(x.right, p, rank + 1);
-        return x; //don't know if this makes sense
+        else cmp = p.y() - x.p.y();
+
+        if (cmp < 0) return contains(x.left, p, rank + 1);
+
+        else return contains(x.right, p, rank + 1);
     }
 
     // draw all of the points to standard draw
     public void draw() {
+        StdDraw.setCanvasSize(400, 400);
+        StdDraw.setXscale(0, 100);
+        StdDraw.setYscale(0, 100);
+        StdDraw.setPenRadius(0.005);
+
+        draw_recursive(root, root);
+    }
+
+    private void draw_recursive(Node node, Node oldNode) {
+        if (node == null) return;
+        draw_node(node);
+        draw_line();
+        draw_recursive(node.left, node.p);
+        draw_recursive(node.right, node.p);
+    }
+
+    private void draw_node(Node node) {
+        StdDraw.point(node.p.x(), node.p.y());
+    }
+
+    private void draw_line(Node newNode, Node oldNode) {
+        if (oldNode.size % 2 == 0) {
+            StdDraw.line(0, newNode.p.y(), 1, newNode.p.y());
+        } else StdDraw.line(newNode.p.x(), 0, newNode.p.x(), 1);
 
     }
 

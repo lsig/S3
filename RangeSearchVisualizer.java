@@ -1,5 +1,3 @@
-package s3;
-
 /******************************************************************************
  *  Compilation:  javac RangeSearchVisualizer.java
  *  Execution:    java RangeSearchVisualizer input.txt
@@ -74,8 +72,8 @@ public class RangeSearchVisualizer {
 
 
             RectHV rect = new RectHV(Math.min(x0, x1), Math.min(y0, y1),
-                                     Math.max(x0, x1), Math.max(y0, y1));
-            
+                    Math.max(x0, x1), Math.max(y0, y1));
+
 //            RectHV wholeplane = new RectHV()
             // draw the points
             StdDraw.clear();
