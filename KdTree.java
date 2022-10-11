@@ -19,6 +19,10 @@ public class KdTree {
             this.p = p;
             this.size = size;
         }
+
+        public int size() {
+            return this.size;
+        }
     }
 
 
@@ -53,7 +57,7 @@ public class KdTree {
         if (cmp < 0) x.left = insert(x.left, p, rank + 1);
         else x.right = insert(x.right, p, rank + 1);
 
-        x.size = 1 + x.left.size + x.right.size;
+        x.size += 1;
         return x;
     }
 
@@ -77,10 +81,10 @@ public class KdTree {
 
     // draw all of the points to standard draw
     public void draw() {
-        StdDraw.setCanvasSize(400, 400);
+        /*StdDraw.setCanvasSize(400, 400);
         StdDraw.setXscale(0, 100);
         StdDraw.setYscale(0, 100);
-        StdDraw.setPenRadius(0.005);
+        StdDraw.setPenRadius(0.005);*/
 
         draw_recursive(root, root);
     }
@@ -88,9 +92,9 @@ public class KdTree {
     private void draw_recursive(Node node, Node oldNode) {
         if (node == null) return;
         draw_node(node);
-        draw_line();
-        draw_recursive(node.left, node.p);
-        draw_recursive(node.right, node.p);
+        draw_line(node, oldNode);
+        draw_recursive(node.left, node);
+        draw_recursive(node.right, node);
     }
 
     private void draw_node(Node node) {
