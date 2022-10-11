@@ -13,6 +13,7 @@
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.SET;
+import edu.princeton.cs.algs4.StdDraw;
 
 
 public class PointSET {
@@ -49,6 +50,9 @@ public class PointSET {
 
     // draw all of the points to standard draw
     public void draw() {
+        for (Point2D point : pointSet) {
+            StdDraw.point(point.x(), point.y());
+        }
     }
 
     // all points in the set that are inside the rectangle
