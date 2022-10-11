@@ -10,10 +10,7 @@
  *
  *************************************************************************/
 
-import edu.princeton.cs.algs4.Point2D;
-import edu.princeton.cs.algs4.RectHV;
-import edu.princeton.cs.algs4.SET;
-import edu.princeton.cs.algs4.StdDraw;
+import edu.princeton.cs.algs4.*;
 
 
 public class PointSET {
@@ -50,9 +47,15 @@ public class PointSET {
 
     // draw all of the points to standard draw
     public void draw() {
+        StdDraw.setCanvasSize(400, 400);
+        StdDraw.setXscale(0, 1);
+        StdDraw.setYscale(0, 1);
+        StdDraw.setPenRadius(0.01);
+
         for (Point2D point : pointSet) {
             StdDraw.point(point.x(), point.y());
         }
+
     }
 
     // all points in the set that are inside the rectangle
@@ -69,6 +72,7 @@ public class PointSET {
     // a nearest neighbor in the set to p; null if set is empty
     public Point2D nearest(Point2D p) {
         if (isEmpty()) return null;
+
         Point2D champion = this.pointSet.max();
         double championDistance = Double.POSITIVE_INFINITY;
         for (Point2D point : this.pointSet) {
@@ -82,6 +86,15 @@ public class PointSET {
     }
 
     public static void main(String[] args) {
+        PointSET ps = new PointSET();
+        for (int i = 0; i < 10; i++) {
+            double x = StdRandom.uniformDouble();
+            double y = StdRandom.uniformDouble();
+            ps.insert(new Point2D(x, y));
+        }
+
+        ps.draw();
+
     }
 
 }
