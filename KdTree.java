@@ -110,7 +110,30 @@ public class KdTree {
 
     // all points in the set that are inside the rectangle
     public Iterable<Point2D> range(RectHV rect) {
-        return null;
+        LinkedQueue<Point2D> pointSet = new LinkedQueue<Point2D>();
+        return range(root, rect, 0, pointSet);
+    }
+
+    private LinkedQueue<Point2D> range(Node x, RectHV rect, int rank, LinkedQueue<Point2D> points) {
+        double cmpMax;
+        double cmpMin;
+        if (x == null) return points;
+        if ((rect.xmax() >= x.p.x() && rect.xmin() <= x.p.x()) && (rect.ymax() >= x.p.y() && rect.ymin() <= x.p.y())) {
+            points.enqueue(x.p);
+        }
+        if (rank % 2 == 0) {
+            cmpMax = rect.xmax() - x.p.x();
+            cmpMin = rect.xmin() - x.p.x();
+        } else {
+            cmpMax = rect.ymax() - x.p.y();
+            cmpMin = rect.ymin() - x.p.y();
+        }
+        if (cmpMax > 0 && cmpMin >= 0) points = range(x.right, rect, rank + 1, points);
+        else if (cmpMax > 0 && cmpMin < 0) {
+            points = range(x.left, rect, rank + 1, points);
+            points = range(x.right, rect, rank + 1, points);
+        } else if (cmpMax < 0 && cmpMin <= 0) points = range(x.left, rect, rank + 1, points);
+        return points;
     }
 
     // a nearest neighbor in the set to p; null if set is empty

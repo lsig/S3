@@ -10,7 +10,10 @@
  *
  *************************************************************************/
 
-import edu.princeton.cs.algs4.*;
+import edu.princeton.cs.algs4.Point2D;
+import edu.princeton.cs.algs4.RectHV;
+import edu.princeton.cs.algs4.SET;
+import edu.princeton.cs.algs4.StdDraw;
 
 
 public class PointSET {
@@ -86,6 +89,7 @@ public class PointSET {
     }
 
     public static void main(String[] args) {
+        /*
         PointSET ps = new PointSET();
         for (int i = 0; i < 10; i++) {
             double x = StdRandom.uniformDouble();
@@ -93,7 +97,7 @@ public class PointSET {
             ps.insert(new Point2D(x, y));
         }
 
-        ps.draw();
+        ps.draw(); */
 
     }
 
