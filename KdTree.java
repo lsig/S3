@@ -135,11 +135,13 @@ public class KdTree {
             cmpMax = rect.ymax() - x.p.y();
             cmpMin = rect.ymin() - x.p.y();
         }
-        if (cmpMax >= 0 && cmpMin >= 0) points = range(x.right, rect, rank + 1, points);
+        if (cmpMin >= 0) points = range(x.right, rect, rank + 1, points);
+
         else if (cmpMax >= 0 && cmpMin <= 0) {
             points = range(x.left, rect, rank + 1, points);
             points = range(x.right, rect, rank + 1, points);
         } else points = range(x.left, rect, rank + 1, points);
+
         return points;
     }
 
@@ -149,35 +151,33 @@ public class KdTree {
         return nearest(root, p, root.p, 0);
     }
 
-    private Point2D nearest(Node x, Point2D p, Point2D champion, int rank) {
-        if (x == null) return champion;
-        RectHV line;
-        Node firstSubtree;
-        Node secondSubtree;
-        double cmp;
-        if (p.distanceSquaredTo(x.p) < p.distanceSquaredTo(champion)) champion = x.p;
-        if (rank % 2 == 0) cmp = p.x() - x.p.x();
-            //line = new RectHV(x.p.x(), 0, x.p.x(), 1);
-        else cmp = p.y() - x.p.y();
-        //line = new RectHV(0, x.p.y(), 1, x.p.y());
-        if (cmp < 0) {
-            //champion = nearest(x.left, p, champion, rank + 1);
-            firstSubtree = x.left;
-            secondSubtree = x.right;
+    private Point2D nearest(Node node, Point2D p, Point2D champion, int rank) {
+        if (node == null) return champion;
+        double rectDist;
+
+        if (p.distanceSquaredTo(node.p) < p.distanceSquaredTo(champion)) {
+            champion = node.p;
+        }
+
+        if (rank % 2 == 0) {
+            rectDist = node.p.x() - p.x();
         } else {
-            //champion = nearest(x.right, p, champion, rank + 1);
-            firstSubtree = x.right;
-            secondSubtree = x.left;
+            rectDist = node.p.y() - p.y();
         }
-        //if (line.distanceSquaredTo(p) <= p.distanceSquaredTo(champion)) {
-        champion = nearest(firstSubtree, p, champion, rank + 1);
-        if (secondSubtree != null) {
-            line = makeLine(secondSubtree.p, rank + 1);
-            if (line.distanceSquaredTo(p) < p.distanceSquaredTo(champion)) {
-                champion = nearest(secondSubtree, p, champion, rank + 1);
+
+        double rectDistSquared = rectDist * rectDist;
+
+        if (p.distanceSquaredTo(champion) < rectDistSquared) {
+            if (rectDist > 0) {
+                champion = nearest(node.left, p, champion, rank + 1);
+            } else {
+                champion = nearest(node.right, p, champion, rank + 1);
             }
-            //}
+        } else {
+            champion = nearest(node.left, p, champion, rank + 1);
+            champion = nearest(node.right, p, champion, rank + 1);
         }
+
         return champion;
     }
 
