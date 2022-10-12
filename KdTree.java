@@ -55,6 +55,7 @@ public class KdTree {
         return x;
     }
 
+    // returns the size of each node, null protected.
     private int size(Node x) {
         if (x == null) return 0;
         else return x.size;
@@ -65,6 +66,7 @@ public class KdTree {
         return contains(root, p, 0);
     }
 
+    // recursively searches through the 2d-tree until either the node to search for is found, or it must not exist in the tree.
     private boolean contains(Node x, Point2D p, int rank) {
         if (x == null) return false;
         if (x.p.equals(p)) return true;
@@ -80,14 +82,10 @@ public class KdTree {
 
     // draw all of the points to standard draw
     public void draw() {
-        /*StdDraw.setCanvasSize(400, 400);
-        StdDraw.setXscale(0, 100);
-        StdDraw.setYscale(0, 100);
-        StdDraw.setPenRadius(0.005);*/
-
         draw_recursive(root, 0, 0, 1, 0, 1);
     }
 
+    // recursively draws all nodes on the canvas, with a line outlining each nodes' rectangle.
     private void draw_recursive(Node node, int rank, double left, double right, double down, double up) {
         if (node == null) return;
         if (rank % 2 == 0) {
@@ -101,16 +99,18 @@ public class KdTree {
             draw_recursive(node.left, rank + 1, left, right, down, node.p.y());
             draw_recursive(node.right, rank + 1, left, right, node.p.y(), up);
         }
-        draw_node(node);
+        draw_point(node);
     }
 
-    private void draw_node(Node node) {
+    // draws a point to StdDraw
+    private void draw_point(Node node) {
         StdDraw.setPenRadius(0.015);
         StdDraw.setPenColor(StdDraw.BLACK);
         StdDraw.point(node.p.x(), node.p.y());
         StdDraw.setPenRadius();
     }
 
+    // draws a line through under a point, ending on an intersection with another line / the edge of the canvas.
     private void draw_line(double left, double right, double down, double up) {
         StdDraw.line(left, down, right, up);
     }
@@ -121,6 +121,8 @@ public class KdTree {
         return range(root, rect, 0, pointSet);
     }
 
+    /* Recursively searches through the 2d-tree, finding all points that can be placed in a given rectangle.
+     * Ignoring the subtrees that are on the other side of the "current" node from the rectangle.*/
     private LinkedQueue<Point2D> range(Node x, RectHV rect, int rank, LinkedQueue<Point2D> points) {
         double cmpMax;
         double cmpMin;
@@ -151,28 +153,22 @@ public class KdTree {
         return nearest(root, p, root.p, 0);
     }
 
+    /* recursively searches through the 2d-tree, looking for a closest node.
+    Disregards subtrees that are in rectangles further away than the "current" closest point.*/
     private Point2D nearest(Node node, Point2D p, Point2D champion, int rank) {
         if (node == null) return champion;
         double rectDist;
 
-        if (p.distanceSquaredTo(node.p) < p.distanceSquaredTo(champion)) {
-            champion = node.p;
-        }
+        if (p.distanceSquaredTo(node.p) < p.distanceSquaredTo(champion)) champion = node.p;
 
-        if (rank % 2 == 0) {
-            rectDist = node.p.x() - p.x();
-        } else {
-            rectDist = node.p.y() - p.y();
-        }
+        if (rank % 2 == 0) rectDist = node.p.x() - p.x();
+        else rectDist = node.p.y() - p.y();
 
         double rectDistSquared = rectDist * rectDist;
 
         if (p.distanceSquaredTo(champion) < rectDistSquared) {
-            if (rectDist > 0) {
-                champion = nearest(node.left, p, champion, rank + 1);
-            } else {
-                champion = nearest(node.right, p, champion, rank + 1);
-            }
+            if (rectDist > 0) champion = nearest(node.left, p, champion, rank + 1);
+            else champion = nearest(node.right, p, champion, rank + 1);
         } else {
             champion = nearest(node.left, p, champion, rank + 1);
             champion = nearest(node.right, p, champion, rank + 1);
@@ -181,10 +177,6 @@ public class KdTree {
         return champion;
     }
 
-    private RectHV makeLine(Point2D subp, int rank) {
-        if (rank % 2 == 0) return new RectHV(subp.x(), 0, subp.x(), 1);
-        else return new RectHV(0, subp.y(), 1, subp.y());
-    }
 
     /*******************************************************************************
      * Test client
