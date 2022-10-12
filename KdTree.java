@@ -85,26 +85,34 @@ public class KdTree {
         StdDraw.setYscale(0, 100);
         StdDraw.setPenRadius(0.005);*/
 
-        draw_recursive(root, root);
+        draw_recursive(root, 0, 0, 1, 0, 1);
     }
 
-    private void draw_recursive(Node node, Node oldNode) {
+    private void draw_recursive(Node node, int rank, double left, double right, double down, double up) {
         if (node == null) return;
+        if (rank % 2 == 0) {
+            StdDraw.setPenColor(StdDraw.RED);
+            draw_line(node.p.x(), node.p.x(), down, up);
+            draw_recursive(node.left, rank + 1, left, node.p.x(), down, up);
+            draw_recursive(node.right, rank + 1, node.p.x(), right, down, up);
+        } else {
+            StdDraw.setPenColor(StdDraw.BLUE);
+            draw_line(left, right, node.p.y(), node.p.y());
+            draw_recursive(node.left, rank + 1, left, right, down, node.p.y());
+            draw_recursive(node.right, rank + 1, left, right, node.p.y(), up);
+        }
         draw_node(node);
-        draw_line(node, oldNode);
-        draw_recursive(node.left, node);
-        draw_recursive(node.right, node);
     }
 
     private void draw_node(Node node) {
+        StdDraw.setPenRadius(0.015);
+        StdDraw.setPenColor(StdDraw.BLACK);
         StdDraw.point(node.p.x(), node.p.y());
+        StdDraw.setPenRadius();
     }
 
-    private void draw_line(Node newNode, Node oldNode) {
-        if (oldNode.size % 2 == 0) {
-            StdDraw.line(0, newNode.p.y(), 1, newNode.p.y());
-        } else StdDraw.line(newNode.p.x(), 0, newNode.p.x(), 1);
-
+    private void draw_line(double left, double right, double down, double up) {
+        StdDraw.line(left, down, right, up);
     }
 
     // all points in the set that are inside the rectangle
