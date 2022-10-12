@@ -50,11 +50,6 @@ public class PointSET {
 
     // draw all of the points to standard draw
     public void draw() {
-        StdDraw.setCanvasSize(400, 400);
-        StdDraw.setXscale(0, 1);
-        StdDraw.setYscale(0, 1);
-        StdDraw.setPenRadius(0.01);
-
         for (Point2D point : pointSet) {
             StdDraw.point(point.x(), point.y());
         }

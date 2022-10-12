@@ -135,11 +135,13 @@ public class KdTree {
             cmpMax = rect.ymax() - x.p.y();
             cmpMin = rect.ymin() - x.p.y();
         }
-        if (cmpMax >= 0 && cmpMin >= 0) points = range(x.right, rect, rank + 1, points);
+        if (cmpMin >= 0) points = range(x.right, rect, rank + 1, points);
+
         else if (cmpMax >= 0 && cmpMin <= 0) {
             points = range(x.left, rect, rank + 1, points);
             points = range(x.right, rect, rank + 1, points);
         } else points = range(x.left, rect, rank + 1, points);
+
         return points;
     }
 
@@ -149,7 +151,34 @@ public class KdTree {
         return nearest(root, p, root.p, 0);
     }
 
-    private Point2D nearest(Node x, Point2D p, Point2D champion, int rank) {
+    private Point2D nearest(Node node, Point2D p, Point2D champion, int rank) {
+        if (node == null) return champion;
+        double rectDist;
+
+        if (p.distanceSquaredTo(node.p) < p.distanceSquaredTo(champion)) {
+            champion = node.p;
+        }
+
+        if (rank % 2 == 0) {
+            rectDist = node.p.x() - p.x();
+        } else {
+            rectDist = node.p.y() - p.y();
+        }
+
+        double rectDistSquared = rectDist * rectDist;
+
+        if (p.distanceSquaredTo(champion) < rectDistSquared) {
+            if (rectDist > 0) {
+                champion = nearest(node.left, p, champion, rank + 1);
+            } else {
+                champion = nearest(node.right, p, champion, rank + 1);
+            }
+        } else {
+            champion = nearest(node.left, p, champion, rank + 1);
+            champion = nearest(node.right, p, champion, rank + 1);
+        }
+
+        return champion;
     }
 
     private RectHV makeLine(Point2D subp, int rank) {
