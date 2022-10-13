@@ -5,21 +5,25 @@ import edu.princeton.cs.algs4.*;
 
 import java.util.Arrays;
 
-public class KdTree {
-    private Node root;
+public class KdTree {// object overhead 16 bytes
+    private Node root;// reference 8 bytes
 
-    private static class Node {
-        private Point2D p;
-        private Node left;
-        private Node right;
-        private int size;
+    private static class Node {// object overhead 16 bytes
+        private Point2D p;// reference 8 bytes + object 32 bytes
+        private Node left;// reference 8 bytes
+        private Node right;// reference 8 bytes
+        private int size;// int 4 bytes
+
+        // each node uses 16 (overhead) + 3*8 (reference) + 4 (int) + 32 (Point2d) + 4 (padding) = 80 bytes of memory.
 
         public Node(Point2D p, int size) {
             this.p = p;
             this.size = size;
         }
     }
-
+    /* each kd tree uses 16 (overhead) + 8 (reference) + 80 (bytes/node) * N (nodes) bytes of memory. That is 24 + 80 N bytes.
+    That gives a tilde notation of T(n) ~ 80n bytes.
+     */
 
     // construct an empty set of points
     public KdTree() {
@@ -44,19 +48,21 @@ public class KdTree {
     private Node insert(Node x, Point2D p, int rank) {
         if (x == null) return new Node(p, 1);
         if (x.p.equals(p)) return x;
+
         double cmp;
+
         if (rank % 2 == 0) cmp = p.x() - x.p.x();
         else cmp = p.y() - x.p.y();
 
         if (cmp < 0) x.left = insert(x.left, p, rank + 1);
         else x.right = insert(x.right, p, rank + 1);
 
-        x.size = 1 + size(x.left) + size(x.right);
+        x.size = 1 + nodeSize(x.left) + nodeSize(x.right);
         return x;
     }
 
     // returns the size of each node, null protected.
-    private int size(Node x) {
+    private int nodeSize(Node x) {
         if (x == null) return 0;
         else return x.size;
     }
@@ -78,41 +84,6 @@ public class KdTree {
         if (cmp < 0) return contains(x.left, p, rank + 1);
 
         else return contains(x.right, p, rank + 1);
-    }
-
-    // draw all of the points to standard draw
-    public void draw() {
-        draw_recursive(root, 0, 0, 1, 0, 1);
-    }
-
-    // recursively draws all nodes on the canvas, with a line outlining each nodes' rectangle.
-    private void draw_recursive(Node node, int rank, double left, double right, double down, double up) {
-        if (node == null) return;
-        if (rank % 2 == 0) {
-            StdDraw.setPenColor(StdDraw.RED);
-            draw_line(node.p.x(), node.p.x(), down, up);
-            draw_recursive(node.left, rank + 1, left, node.p.x(), down, up);
-            draw_recursive(node.right, rank + 1, node.p.x(), right, down, up);
-        } else {
-            StdDraw.setPenColor(StdDraw.BLUE);
-            draw_line(left, right, node.p.y(), node.p.y());
-            draw_recursive(node.left, rank + 1, left, right, down, node.p.y());
-            draw_recursive(node.right, rank + 1, left, right, node.p.y(), up);
-        }
-        draw_point(node);
-    }
-
-    // draws a point to StdDraw
-    private void draw_point(Node node) {
-        StdDraw.setPenRadius(0.015);
-        StdDraw.setPenColor(StdDraw.BLACK);
-        StdDraw.point(node.p.x(), node.p.y());
-        StdDraw.setPenRadius();
-    }
-
-    // draws a line through under a point, ending on an intersection with another line / the edge of the canvas.
-    private void draw_line(double left, double right, double down, double up) {
-        StdDraw.line(left, down, right, up);
     }
 
     // all points in the set that are inside the rectangle
@@ -177,6 +148,45 @@ public class KdTree {
         return champion;
     }
 
+
+    /*
+     * draw implementation
+     */
+
+    // draw all of the points to standard draw
+    public void draw() {
+        draw_recursive(root, 0, 0, 1, 0, 1);
+    }
+
+    // recursively draws all nodes on the canvas, with a line outlining each nodes' rectangle.
+    private void draw_recursive(Node node, int rank, double left, double right, double down, double up) {
+        if (node == null) return;
+        if (rank % 2 == 0) {
+            StdDraw.setPenColor(StdDraw.RED);
+            draw_line(node.p.x(), node.p.x(), down, up);
+            draw_recursive(node.left, rank + 1, left, node.p.x(), down, up);
+            draw_recursive(node.right, rank + 1, node.p.x(), right, down, up);
+        } else {
+            StdDraw.setPenColor(StdDraw.BLUE);
+            draw_line(left, right, node.p.y(), node.p.y());
+            draw_recursive(node.left, rank + 1, left, right, down, node.p.y());
+            draw_recursive(node.right, rank + 1, left, right, node.p.y(), up);
+        }
+        draw_point(node);
+    }
+
+    // draws a point to StdDraw
+    private void draw_point(Node node) {
+        StdDraw.setPenRadius(0.01);
+        StdDraw.setPenColor(StdDraw.BLACK);
+        StdDraw.point(node.p.x(), node.p.y());
+        StdDraw.setPenRadius();
+    }
+
+    // draws a line through under a point, ending on an intersection with another line / the edge of the canvas.
+    private void draw_line(double left, double right, double down, double up) {
+        StdDraw.line(left, down, right, up);
+    }
 
     /*******************************************************************************
      * Test client
