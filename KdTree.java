@@ -1,9 +1,10 @@
 /*************************************************************************
  *************************************************************************/
 
-import edu.princeton.cs.algs4.*;
-
-import java.util.Arrays;
+import edu.princeton.cs.algs4.LinkedQueue;
+import edu.princeton.cs.algs4.Point2D;
+import edu.princeton.cs.algs4.RectHV;
+import edu.princeton.cs.algs4.StdDraw;
 
 public class KdTree {// object overhead 16 bytes
     private Node root;// reference 8 bytes
@@ -46,18 +47,18 @@ public class KdTree {// object overhead 16 bytes
 
     // recursively searches through the tree and adds the point if it doesn't exist.
     private Node insert(Node x, Point2D p, int rank) {
-        if (x == null) return new Node(p, 1);
-        if (x.p.equals(p)) return x;
+        if (x == null) return new Node(p, 1); // constant
+        if (x.p.equals(p)) return x; // constant
 
-        double cmp;
+        double cmp; // constant
 
-        if (rank % 2 == 0) cmp = p.x() - x.p.x();
-        else cmp = p.y() - x.p.y();
+        if (rank % 2 == 0) cmp = p.x() - x.p.x(); // constant
+        else cmp = p.y() - x.p.y(); // constant
 
-        if (cmp < 0) x.left = insert(x.left, p, rank + 1);
-        else x.right = insert(x.right, p, rank + 1);
+        if (cmp < 0) x.left = insert(x.left, p, rank + 1); // log n best case, n worst case.
+        else x.right = insert(x.right, p, rank + 1); // log n best case, n worst case.
 
-        x.size = 1 + nodeSize(x.left) + nodeSize(x.right);
+        x.size = 1 + nodeSize(x.left) + nodeSize(x.right);  // constant
         return x;
     }
 
@@ -192,7 +193,39 @@ public class KdTree {// object overhead 16 bytes
      * Test client
      ******************************************************************************/
     public static void main(String[] args) {
-        In in = new In();
+
+        /*In in = new In("../packet/SomeInputs/input10k.txt");
+        KdTree tree = new KdTree();
+        for (int i = 0; !in.isEmpty(); i++) {
+            tree.insert(new Point2D(in.readDouble(), in.readDouble()));
+        }
+        StdDraw.enableDoubleBuffering();
+        StdDraw.clear();
+        tree.draw();
+        StdDraw.show();*/
+
+
+        /*int[] N_s = new int[]{10_000, 20_000, 40_000, 80_000, 160_000, 320_000, 640_000, 1_280_000, 2_560_000, 5_120_000};
+        for (int N : N_s) {
+            Point2D[] pointArray = new Point2D[N];
+
+            for (int i = 0; i < N; i++) {
+                pointArray[i] = new Point2D(StdRandom.uniformDouble(), StdRandom.uniformDouble());
+            }
+            KdTree tree = new KdTree();
+
+            Stopwatch watch = new Stopwatch();
+            for (Point2D point : pointArray)
+                tree.insert(point);
+            double time = watch.elapsedTime();
+
+            StdOut.printf("time for %d points: %f seconds\n", N, time);
+        }*/
+
+
+
+
+        /*In in = new In();
         Out out = new Out();
         int nrOfRecangles = in.readInt();
         int nrOfPointsCont = in.readInt();
@@ -242,6 +275,7 @@ public class KdTree {// object overhead 16 bytes
             out.println((i + 1) + ": " + set.nearest(pointsNear[i]));
         }
 
-        out.println();
+        out.println();*/
     }
+
 }
